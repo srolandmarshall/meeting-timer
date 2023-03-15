@@ -27,7 +27,11 @@ function App() {
         handleToggleTimer={handleToggleTimer}
       />
       <hr />
-      <AgendaPreview meetingTime={meetingTime} agenda={agenda} />
+      <AgendaPreview
+        timerRunning={timerRunning}
+        meetingTime={meetingTime}
+        agenda={agenda}
+      />
     </div>
   );
 }
