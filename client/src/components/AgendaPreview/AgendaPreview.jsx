@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 
 const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
   const [agendaWithTime, setAgendaWithTime] = useState("");
+  const [h2Timers, setH2Timers] = useState({});
 
   useEffect(() => {
     if (agenda.trim() === "") {
@@ -15,18 +16,22 @@ const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
     const h2TimeSeconds = Math.round((meetingTime * 60) / numH2s);
 
     let agendaWithDuration = "";
+    let h2TimerValues = {};
+    let h2Index = 1;
 
     splitAgenda.forEach((line) => {
       if (line.startsWith("##")) {
-        agendaWithDuration += `${line} (${convertSecondsToTime(
-          h2TimeSeconds
-        )})\n`;
+        const h2Timer = convertSecondsToTime(h2TimeSeconds);
+        agendaWithDuration += `${line} (${h2Timer})\n`;
+        h2TimerValues[h2Index] = h2TimeSeconds;
+        h2Index++;
       } else {
         agendaWithDuration += `${line}\n`;
       }
     });
 
     setAgendaWithTime(agendaWithDuration);
+    setH2Timers(h2TimerValues);
   }, [agenda, meetingTime]);
 
   // Function to convert seconds to time notation (MM:SS)
@@ -39,19 +44,11 @@ const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
     )}`;
   };
 
-  const isTimerRunning = (timerRunning) => {
-    if (timerRunning) {
-      return "Timer is running";
-    } else {
-      return "Timer is not running";
-    }
-  };
-
   return (
     <div>
       <h3>Agenda Preview</h3>
       <ReactMarkdown>{agendaWithTime}</ReactMarkdown>
-      <p>{isTimerRunning(timerRunning)}</p>
+      <p>{JSON.stringify(h2Timers)}</p>
     </div>
   );
 };
