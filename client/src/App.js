@@ -7,15 +7,16 @@ import MeetingTimeInput from "./components/MeetingTimeInput/MeetingTimeInput";
 function App() {
   const [agenda, setAgenda] = useState("");
   const [meetingTime, setMeetingTime] = useState(60);
+  /* get the meetingtime value from MeetingTimeInput and pass it to AgendaPreview */
 
   return (
     <div className="App">
       <MeetingTimeInput
-        value={meetingTime}
-        onChange={(event) => setMeetingTime(event.target.value)}
+        meetingTime={meetingTime}
+        setMeetingTime={setMeetingTime}
       />
       <MeetingForm setAgenda={setAgenda} />
-      <AgendaPreview agenda={agenda} />
+      <AgendaPreview meetingTime={meetingTime} agenda={agenda} />
     </div>
   );
 }

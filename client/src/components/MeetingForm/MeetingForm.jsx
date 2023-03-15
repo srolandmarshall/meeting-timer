@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import "./MeetingForm.css";
 
 function MeetingForm(props) {
-  const [agendaText, setAgendaText] = useState("");
-
   const handleAgendaChange = (event) => {
     const text = event.target.value;
-    setAgendaText(text);
     props.setAgenda(text);
   };
 
@@ -16,7 +13,7 @@ function MeetingForm(props) {
       <textarea
         id="agenda-text"
         name="agenda-text"
-        value={agendaText}
+        value={props.agenda}
         onChange={handleAgendaChange}
       />
     </div>
