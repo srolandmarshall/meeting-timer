@@ -3,7 +3,7 @@ import ReactMarkdown from "react-markdown";
 
 const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
   const [agendaWithTime, setAgendaWithTime] = useState("");
-  const [h2Timers, setH2Timers] = useState({});
+  const [h2Timers, setH2Timers] = useState([]);
   const [currentH2Index, setCurrentH2Index] = useState(0);
 
   useEffect(() => {
@@ -13,26 +13,15 @@ const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
     }
 
     const splitAgenda = agenda.split(/[\n\r]/);
-    const numH2s = splitAgenda.filter((line) => line.startsWith("##")).length;
+    const numH2s = splitAgenda.filter((line) => line.startsWith("## ")).length;
     const h2TimeSeconds = Math.round((meetingTime * 60) / numH2s);
+    console.log(
+      `numH2s: ${numH2s}, meetingTime: ${meetingTime}, h2TimeSeconds: ${h2TimeSeconds}`
+    );
 
-    let agendaWithDuration = "";
-    let h2TimerValues = {};
-    let h2Index = 0;
+    const h2Timers = Array.from({ length: numH2s }, () => h2TimeSeconds);
 
-    splitAgenda.forEach((line) => {
-      if (line.startsWith("##")) {
-        const h2Timer = convertSecondsToTime(h2TimeSeconds);
-        agendaWithDuration += `${line} (${h2Timer})\n`;
-        h2TimerValues[h2Index] = h2TimeSeconds;
-        h2Index++;
-      } else {
-        agendaWithDuration += `${line}\n`;
-      }
-    });
-
-    setAgendaWithTime(agendaWithDuration);
-    setH2Timers(h2TimerValues);
+    setH2Timers(h2Timers);
   }, [agenda, meetingTime]);
 
   useEffect(() => {
@@ -44,24 +33,44 @@ const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
       setH2Timers((timers) => {
         // Find the next non-zero timer, starting from the current index
         let index = currentH2Index;
-        while (timers[index] === 0 && index <= Object.keys(timers).length) {
+        while (timers[index] === 0 && index < timers.length - 1) {
           index++;
         }
-        if (index > Object.keys(timers).length) {
-          // All timers have reached 0, stop the interval
-          clearInterval(timer);
-          return timers;
-        }
-        const updatedTimer = { ...timers };
-        updatedTimer[index] = timers[index] - 1;
+        const updatedTimers = [...timers];
+        updatedTimers[index] = timers[index] - 1;
         setCurrentH2Index(index);
-        return updatedTimer;
+        return updatedTimers;
       });
     }, 1000);
 
     // Clear the interval when the component unmounts or the timer is stopped
     return () => clearInterval(timer);
   }, [timerRunning, currentH2Index]);
+
+  useEffect(() => {
+    if (agenda.trim() === "") {
+      setAgendaWithTime("");
+      return;
+    }
+
+    const splitAgenda = agenda.split(/[\n\r]/);
+    let agendaWithDuration = "";
+    let h2Index = 0;
+
+    splitAgenda.forEach((line, index) => {
+      if (line.startsWith("## ")) {
+        const timeRemaining = h2Timers[h2Index];
+        h2Index += 1;
+        agendaWithDuration += `${line} (${convertSecondsToTime(
+          timeRemaining
+        )})\n`;
+      } else {
+        agendaWithDuration += `${line}\n`;
+      }
+    });
+
+    setAgendaWithTime(agendaWithDuration);
+  }, [agenda, h2Timers]);
 
   // Function to convert seconds to time notation (MM:SS)
   const convertSecondsToTime = (time) => {
