@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 
-const AgendaPreview = ({ agenda, meetingTime }) => {
+const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
   const [agendaWithTime, setAgendaWithTime] = useState("");
 
   useEffect(() => {
@@ -39,10 +39,19 @@ const AgendaPreview = ({ agenda, meetingTime }) => {
     )}`;
   };
 
+  const isTimerRunning = (timerRunning) => {
+    if (timerRunning) {
+      return "Timer is running";
+    } else {
+      return "Timer is not running";
+    }
+  };
+
   return (
     <div>
       <h3>Agenda Preview</h3>
       <ReactMarkdown>{agendaWithTime}</ReactMarkdown>
+      <p>{isTimerRunning(timerRunning)}</p>
     </div>
   );
 };
