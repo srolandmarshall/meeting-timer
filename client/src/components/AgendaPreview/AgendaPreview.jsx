@@ -1,10 +1,10 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 const AgendaPreview = ({ agenda }) => {
   return (
     <div>
-      <h3>Agenda Preview</h3>
-      <p>{agenda}</p>
+      <ReactMarkdown>{agenda}</ReactMarkdown>
     </div>
   );
 };
