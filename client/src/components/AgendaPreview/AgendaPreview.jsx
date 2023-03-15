@@ -11,29 +11,16 @@ const AgendaPreview = ({ agenda, meetingTime }) => {
     }
 
     const splitAgenda = agenda.split(/[\n\r]/);
-    let numH2s = splitAgenda.filter((line) => line.startsWith("##")).length;
+    const numH2s = splitAgenda.filter((line) => line.startsWith("##")).length;
+    const h2TimeSeconds = Math.round((meetingTime * 60) / numH2s);
 
-    const meetingDuration = parseInt(meetingTime);
-    let durationLeft = meetingDuration;
     let agendaWithDuration = "";
-    let currentH2Duration = 0;
 
     splitAgenda.forEach((line) => {
       if (line.startsWith("##")) {
-        currentH2Duration = Math.min(
-          meetingDuration,
-          Math.ceil(durationLeft / numH2s)
-        );
-        durationLeft -= currentH2Duration;
-        numH2s--;
-
-        const minutes = Math.floor(currentH2Duration / 60);
-        const seconds = currentH2Duration % 60;
-        const timeStr = `${minutes.toString().padStart(2, "0")}:${seconds
-          .toString()
-          .padStart(2, "0")}`;
-
-        agendaWithDuration += `${line} (${timeStr})\n`;
+        agendaWithDuration += `${line} (${convertSecondsToTime(
+          h2TimeSeconds
+        )})\n`;
       } else {
         agendaWithDuration += `${line}\n`;
       }
@@ -41,6 +28,16 @@ const AgendaPreview = ({ agenda, meetingTime }) => {
 
     setAgendaWithTime(agendaWithDuration);
   }, [agenda, meetingTime]);
+
+  // Function to convert seconds to time notation (MM:SS)
+  const convertSecondsToTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = time % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+      2,
+      "0"
+    )}`;
+  };
 
   return (
     <div>
