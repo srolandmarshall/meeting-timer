@@ -36,3 +36,6 @@
 
 # Ignore client-side node_modules
 /client/node_modules
+
+# Ignore demo videos and images
+/demo
