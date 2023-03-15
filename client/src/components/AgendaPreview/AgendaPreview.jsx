@@ -13,18 +13,27 @@ const AgendaPreview = ({ agenda, meetingTime, timerRunning }) => {
     }
 
     const splitAgenda = agenda.split(/[\n\r]/);
-    const agendaWithDuration = splitAgenda
-      .map((line, index) => {
-        if (line.startsWith("##")) {
-          const h2Timer = convertSecondsToTime(h2Timers[index]);
-          return `${line} (${h2Timer})`;
-        }
-        return line;
-      })
-      .join("\n");
+    const numH2s = splitAgenda.filter((line) => line.startsWith("##")).length;
+    const h2TimeSeconds = Math.round((meetingTime * 60) / numH2s);
+
+    let agendaWithDuration = "";
+    let h2TimerValues = {};
+    let h2Index = 0;
+
+    splitAgenda.forEach((line) => {
+      if (line.startsWith("##")) {
+        const h2Timer = convertSecondsToTime(h2TimeSeconds);
+        agendaWithDuration += `${line} (${h2Timer})\n`;
+        h2TimerValues[h2Index] = h2TimeSeconds;
+        h2Index++;
+      } else {
+        agendaWithDuration += `${line}\n`;
+      }
+    });
 
     setAgendaWithTime(agendaWithDuration);
-  }, [agenda, h2Timers]);
+    setH2Timers(h2TimerValues);
+  }, [agenda, meetingTime]);
 
   useEffect(() => {
     if (!timerRunning) {
